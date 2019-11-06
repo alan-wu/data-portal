@@ -28,7 +28,7 @@
     "broadcast-channel": "^2.1.12",
     "fdikbquery": "^0.1.15",
     "jquery": "^3.4.1",
-    "mapcoreintegratedwebapp": "^0.2.8",
+    "mapcoreintegratedwebapp": "^0.2.9",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3"
   }
