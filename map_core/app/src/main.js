@@ -8,6 +8,7 @@ let main = function () {
 	let fullscreenButton = document.getElementById("fullscreen-button");
   let mapContent = document.querySelector(".maptab-contents");
   let fdikbquery = undefined;
+  let overlayWidget = undefined;
   let channelName = "sparc-mapcore-channel";
 
   let findItemWithTypeNameInManager = function (manager, typeName) {
@@ -114,8 +115,22 @@ let main = function () {
 
 	//Messages come in from letious module, this method determine what to do with them
   let processMessage = function (message) {
+    console.log(message)
     switch (message.action) {
       case "query-data":
+        if (message.resource && message.sender === "flatmap") {
+          let metaURL = undefined;
+          if (message.resource[0] === "UBERON:0000948") {
+            metaURL = "https://mapcore-bucket1.s3-us-west-2.amazonaws.com/ISAN/scaffold/use_case4/rat_heart_metadata.json"
+
+          } else if (message.resource[0] === "UBERON:0002440"){
+            metaURL = "https://mapcore-bucket1.s3-us-west-2.amazonaws.com/ISAN/scaffold/stellate/stellate_metadata.json"
+          }
+          if (metaURL) {
+            let tabContainment = document.getElementById("maptab_container");
+            overlayWidget.display3DScaffold(tabContainment, metaURL);
+          }
+        }
         break;
       case "flatmap-show":
         if (message.resource) {
@@ -156,6 +171,30 @@ let main = function () {
     }
 
   };
+
+  	//Messages come in from letious module, this method determine what to do with them
+    let processLinearMessage = function (message) {
+      console.log(message)
+      switch (message.action) {
+        case "query-data":
+          let dataURL = undefined;
+          if (message.resource && (message.sender === "default")) {
+            if (message.resource.includes("HB_")) {
+              dataURL = "https://mapcore-bucket1.s3-us-west-2.amazonaws.com/ISAN/csv-data/use-case-4/RNA_Seq.csv";
+            } else if (message.resource.includes("sample")) {
+              dataURL = "https://mapcore-bucket1.s3-us-west-2.amazonaws.com/ISAN/csv-data/stellate/directory-meta.json";
+            }
+            if (dataURL) {
+              let tabContainment = document.getElementById("maptab_container");
+              overlayWidget.displayData(tabContainment, dataURL);
+            }
+          }
+          break;
+        default:
+          break;
+      }
+  
+    };
 
 	let fullscreenToggle = function() {
 		if (document.fullscreenElement || document.webkitFullscreenElement ||
@@ -216,7 +255,9 @@ let main = function () {
       moduleManager.addConstructor("Biolucida Interface", maplib.BiolucidaModule, maplib.BiolucidaDialog);
       let tabContainment = document.getElementById("maptab_container");
       tabManager = new (require('./tabmanager').TabManager)(tabContainment, moduleManager);
-
+      overlayWidget = new (require('./overview').Overview)(maplibIn);
+      let linearChannel = new (require('broadcast-channel')).default("sparc-mapcore-linear");
+      linearChannel.onmessage = processLinearMessage;
       if (window.location.hash !== "") {
         tabManager.processHash(window.location.hash);
       } else {

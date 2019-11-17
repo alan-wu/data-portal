@@ -29,6 +29,7 @@
     "fdikbquery": "^0.1.15",
     "jquery": "^3.4.1",
     "mapcoreintegratedwebapp": "^0.2.9",
+    "plotsvy": "^0.4.2",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3"
   }
