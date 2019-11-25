@@ -40,7 +40,7 @@ let main = function () {
 
 	let createOrganViewer = function (species, organ, annotation, url) {
     if (tabManager) {
-      let data = tabManager.createDialog("Organ Viewer");
+      let data = tabManager.createDialog("Organ Viewer", true, undefined);
       data.module.loadOrgansFromURL(url, species, organ, annotation);
       let title = annotation + "(Scaffold)";
       if (organ)
@@ -57,7 +57,7 @@ let main = function () {
   let createDataViewer = function (organ, annotation, url, channelNames) {
     if (tabManager) {
       let options = {"url":url};
-      let data = tabManager.createDialog("Data Viewer", options);
+      let data = tabManager.createDialog("Data Viewer", true, options);
       let title = annotation + "(Data)";
       if (organ)
         title = organ + " " + title;
@@ -70,7 +70,7 @@ let main = function () {
 
   let createSimulationViewer = function (simulation_name, options) {
     if (tabManager) {
-      let data = tabManager.createDialog("Simulation Interface", options);
+      let data = tabManager.createDialog("Simulation Interface", true, options);
       let title = simulation_name + "(Simulation)";
       tabManager.setTitle(data, title);
       return data;
@@ -79,7 +79,7 @@ let main = function () {
 
   let createBiolucidaViewer = function (tab_name, options) {
     if (tabManager) {
-      let data = tabManager.createDialog("Biolucida Interface", options);
+      let data = tabManager.createDialog("Biolucida Interface", true, options);
       let truncated_tab_name = (tab_name.length > 21) ? tab_name.substr(0, 17) + '&hellip;': tab_name;
       let title = truncated_tab_name + "(Image)";
       tabManager.setTitle(data, title);
@@ -89,7 +89,7 @@ let main = function () {
 
   let createFlatmap = function (species, entry) {
     if (tabManager) {
-      let data = tabManager.createDialog("Flatmap", {flatmapEntry: entry});
+      let data = tabManager.createDialog("Flatmap", true, {flatmapEntry: entry});
       let title = entry + "(Flatmap)";
       if (species)
         title = species + " " + title;
@@ -125,8 +125,7 @@ let main = function () {
             metaURL = "https://mapcore-bucket1.s3-us-west-2.amazonaws.com/ISAN/scaffold/stellate/stellate_metadata.json"
           }
           if (metaURL) {
-            let tabContainment = document.getElementById("maptab_container");
-            overlayWidget.display3DScaffold(tabContainment, metaURL);
+            overlayWidget.display3DScaffold(mapContent, metaURL);
           }
         }
         break;
@@ -183,8 +182,7 @@ let main = function () {
               dataURL = "https://mapcore-bucket1.s3-us-west-2.amazonaws.com/ISAN/csv-data/stellate/directory-meta.json";
             }
             if (dataURL) {
-              let tabContainment = document.getElementById("maptab_container");
-              overlayWidget.displayData(tabContainment, dataURL);
+              overlayWidget.displayData(mapContent, dataURL);
             }
           }
           break;

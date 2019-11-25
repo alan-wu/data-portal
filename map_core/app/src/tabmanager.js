@@ -22,6 +22,9 @@ exports.TabManager = function(parentIn, moduleManagerIn ) {
 		}
 		targetData.contentElem.className += " active";
 		targetData.buttonElem.className += " active";
+		const targetDialog = targetData.contentElem.querySelector(".ui-dialog");
+		if (targetDialog)
+			targetDialog.style.display = "block";
 	};
 
 	const destroyElement = function(targetData) {
@@ -35,9 +38,9 @@ exports.TabManager = function(parentIn, moduleManagerIn ) {
 		let data = new TabData();
 		data.module = module;
 		data.contentElem = document.createElement("div");
-		data.contentElem.className = "maptab-tab-content active";
+		data.contentElem.className = "maptab-tab-content";
 		data.buttonElem = document.createElement("div");
-		data.buttonElem.classList = "tablinks active";
+		data.buttonElem.classList = "tablinks";
 		data.textElem = document.createElement("div");
 		data.buttonElem.appendChild(data.textElem);
 		let closeButton = document.createElement("button");
@@ -72,8 +75,9 @@ exports.TabManager = function(parentIn, moduleManagerIn ) {
 		const settings = parser.parseString(hash);
 		for (let i = 0; i < settings.length; i++) {
 			let setting = settings[i];
+			let flag = (i == 0) ? true : false;
 			if (setting.dialog) {
-				let data = _this.createDialog(setting.dialog, setting);
+				let data = _this.createDialog(setting.dialog, flag, setting);
 				data.module.importSettings(setting);
 				_this.setTitle(data, data.module.instanceName);
 			}
@@ -87,10 +91,12 @@ exports.TabManager = function(parentIn, moduleManagerIn ) {
 		}
 	};
 	
-	this.createDialog = function(type, options) {
+	this.createDialog = function(type, focus, options) {
 		let newModule = moduleManager.createModule(type);
 		if (newModule) {
 			let data = addDialog(newModule);
+			if (focus)
+				toggleActiveElement(data);
 			let newDialog = moduleManager.createDialog(newModule, data.contentElem, options);
 			if (newDialog) {
 				// newDialog.setTitle(type);
@@ -104,7 +110,6 @@ exports.TabManager = function(parentIn, moduleManagerIn ) {
 				data.dialog = newDialog;
 				data.textElem.innerHTML = type;
 				tabData.push(data);
-				toggleActiveElement(data);
 				if (type === "Organ Viewer") {
 					data.module.addBroadcastChannels("sparc-mapcore-channel");
 				}

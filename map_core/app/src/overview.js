@@ -6,42 +6,34 @@ exports.Overview = function(maplibIn, tabManagerIn) {
 	let scaffoldDialog = undefined;
 	let plotsvyModule = undefined;
 	let plotsvyDialog = undefined;
-
-	const dock = function(dialog) {
-		return function() {
-			
-		}
-	}
+	let scrollTop = 0;
 
 	const overwriteDialogMaximiseCallback = function(dialog, callback) {
 		let element = dialog.container.parent().find('#iconExpand');
 		element.unbind( "click" );
 		element.click(callback);
-		//$(this).dialog('widget').find('.ui-dialog-title')
-		//window.clickElement = element
-		//element.addEventListener("click", dock);
-
-	}
+	};
+	
 
 	const createDataViewer = function (organ, annotation, url) {
-		return function() {
+		return function(dialog) {
 			if (tabManager) {
-			let options = {"url":url};
-			let data = tabManager.createDialog("Data Viewer", options);
-			let title = annotation + "(Data)";
-			if (organ)
-				title = organ + " " + title;
-					data.module.setName(title);
-					
+				let options = {"url":url};
+				let data = tabManager.createDialog("Data Viewer", false, options);
+				let title = annotation + "(Data)";
+				if (organ)
+					title = organ + " " + title;
+				data.module.setName(title);	
+				tabManager.setTitle(data, title);
+				plotsvyDialog.close();
 			}
-			tabManager.setTitle(data, title);
 		}
 	  };
 
 	const createOrganViewer = function (species, organ, annotation, url) {
-		return function() {
+		return function(dialog) {
 			if (tabManager) {
-				let data = tabManager.createDialog("Organ Viewer");
+				let data = tabManager.createDialog("Organ Viewer", false);
 				data.module.loadOrgansFromURL(url, species, organ, annotation);
 				let title = annotation + "(Scaffold)";
 				if (organ)
@@ -50,6 +42,7 @@ exports.Overview = function(maplibIn, tabManagerIn) {
 				tabManager.setTitle(data, title);
 				let viewport = scaffoldModule.zincRenderer.getCurrentScene().getZincCameraControls().getCurrentViewport();
 				data.module.zincRenderer.getCurrentScene().loadView(viewport);
+				scaffoldDialog.close();
 			}
 		}
 	};
