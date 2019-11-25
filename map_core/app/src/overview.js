@@ -1,10 +1,59 @@
-exports.Overview = function(maplibIn) {
+exports.Overview = function(maplibIn, tabManagerIn) {
     let instance = undefined;
 	const maplib = maplibIn;
+	const tabManager = tabManagerIn;
 	let scaffoldModule = undefined;
 	let scaffoldDialog = undefined;
 	let plotsvyModule = undefined;
 	let plotsvyDialog = undefined;
+
+	const dock = function(dialog) {
+		return function() {
+			
+		}
+	}
+
+	const overwriteDialogMaximiseCallback = function(dialog, callback) {
+		let element = dialog.container.parent().find('#iconExpand');
+		element.unbind( "click" );
+		element.click(callback);
+		//$(this).dialog('widget').find('.ui-dialog-title')
+		//window.clickElement = element
+		//element.addEventListener("click", dock);
+
+	}
+
+	const createDataViewer = function (organ, annotation, url) {
+		return function() {
+			if (tabManager) {
+			let options = {"url":url};
+			let data = tabManager.createDialog("Data Viewer", options);
+			let title = annotation + "(Data)";
+			if (organ)
+				title = organ + " " + title;
+					data.module.setName(title);
+					
+			}
+			tabManager.setTitle(data, title);
+		}
+	  };
+
+	const createOrganViewer = function (species, organ, annotation, url) {
+		return function() {
+			if (tabManager) {
+				let data = tabManager.createDialog("Organ Viewer");
+				data.module.loadOrgansFromURL(url, species, organ, annotation);
+				let title = annotation + "(Scaffold)";
+				if (organ)
+					title = organ + " " + title;
+				data.module.setName(title);
+				tabManager.setTitle(data, title);
+				let viewport = scaffoldModule.zincRenderer.getCurrentScene().getZincCameraControls().getCurrentViewport();
+				data.module.zincRenderer.getCurrentScene().loadView(viewport);
+			}
+		}
+	};
+
 
 	const dialogDestroyed = function() {
 		return function(myInstance) {
@@ -31,8 +80,10 @@ exports.Overview = function(maplibIn) {
 					newDialog.showCloseButton();
 					newDialog.beforeCloseCallbacks.push(dialogDestroyed());
 					newDialog.module.addBroadcastChannels("sparc-mapcore-linear");
+					newDialog.setWidth("30%");
 					newDialog.setHeight("50%");
-					newDialog.setPosition("75%", "50%");
+					newDialog.setPosition("70%", "50%");
+					overwriteDialogMaximiseCallback(newDialog,createDataViewer(undefined, "Docked", url) );
 					plotsvyModule = newModule;
 					plotsvyDialog = newDialog;
 				}
@@ -53,9 +104,10 @@ exports.Overview = function(maplibIn) {
 					newDialog.showCloseButton();
 					newDialog.beforeCloseCallbacks.push(dialogDestroyed());
 					newDialog.module.addBroadcastChannels("sparc-mapcore-linear");
-					newDialog.setWidth("25%");
+					newDialog.setWidth("30%");
 					newDialog.setHeight("50%");
-					newDialog.setPosition("75%", "0%");
+					newDialog.setPosition("70%", "0%");
+					overwriteDialogMaximiseCallback(newDialog, createOrganViewer(undefined, undefined, "Docked", url));
 					scaffoldModule = newModule;
 					scaffoldDialog = newDialog;
 				}

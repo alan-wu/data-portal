@@ -115,14 +115,12 @@ let main = function () {
 
 	//Messages come in from letious module, this method determine what to do with them
   let processMessage = function (message) {
-    console.log(message)
     switch (message.action) {
       case "query-data":
         if (message.resource && message.sender === "flatmap") {
           let metaURL = undefined;
           if (message.resource[0] === "UBERON:0000948") {
             metaURL = "https://mapcore-bucket1.s3-us-west-2.amazonaws.com/ISAN/scaffold/use_case4/rat_heart_metadata.json"
-
           } else if (message.resource[0] === "UBERON:0002440"){
             metaURL = "https://mapcore-bucket1.s3-us-west-2.amazonaws.com/ISAN/scaffold/stellate/stellate_metadata.json"
           }
@@ -255,7 +253,7 @@ let main = function () {
       moduleManager.addConstructor("Biolucida Interface", maplib.BiolucidaModule, maplib.BiolucidaDialog);
       let tabContainment = document.getElementById("maptab_container");
       tabManager = new (require('./tabmanager').TabManager)(tabContainment, moduleManager);
-      overlayWidget = new (require('./overview').Overview)(maplibIn);
+      overlayWidget = new (require('./overview').Overview)(maplibIn, tabManager);
       let linearChannel = new (require('broadcast-channel')).default("sparc-mapcore-linear");
       linearChannel.onmessage = processLinearMessage;
       if (window.location.hash !== "") {
